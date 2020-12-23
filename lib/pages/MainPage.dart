@@ -4,6 +4,8 @@ import 'package:kobe_flutter/generated/l10n.dart';
 import 'package:kobe_flutter/net/ApiService.dart';
 import 'package:package_info/package_info.dart';
 
+import 'HomePage.dart';
+
 class MainPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -41,7 +43,7 @@ class _HomePageState extends State<MainPage> {
         title: Text(S.of(context).main_page),
       ),
       drawer: _MyDrawer(imageUrl),
-      // bottomNavigationBar: new BottomNavigationBar(items: null),
+      body: HomePage(),
     );
   }
 }
