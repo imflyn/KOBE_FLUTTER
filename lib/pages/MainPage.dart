@@ -12,43 +12,12 @@ class MainPage extends StatefulWidget {
 }
 
 class _HomePageState extends State<MainPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).main_page),
-      ),
-      drawer: _MyDrawer(),
-      // bottomNavigationBar: new BottomNavigationBar(items: null),
-    );
-  }
-}
-
-class _MyDrawer extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _DrawerState();
-  }
-}
-
-class _DrawerState extends State<_MyDrawer> {
-  String version = '';
   String imageUrl = '';
+  String version = '';
 
   @override
   void initState() {
     super.initState();
-    _getVersion();
     _getImageUrl();
   }
 
@@ -57,18 +26,60 @@ class _DrawerState extends State<_MyDrawer> {
     super.dispose();
   }
 
-  String _getVersion() {
-    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+  _getImageUrl() {
+    ApiService.getDailyImageUrl().then((String url) {
       setState(() {
-        version = packageInfo.version;
+        imageUrl = url;
       });
     });
   }
 
-  String _getImageUrl() {
-    ApiService.getDailyImageUrl().then((String url) {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(S.of(context).main_page),
+      ),
+      drawer: _MyDrawer(imageUrl),
+      // bottomNavigationBar: new BottomNavigationBar(items: null),
+    );
+  }
+}
+
+class _MyDrawer extends StatefulWidget {
+  String imageUrl = '';
+
+  _MyDrawer(this.imageUrl);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _DrawerState(imageUrl);
+  }
+}
+
+class _DrawerState extends State<_MyDrawer> {
+  String version = '';
+  String imageUrl = '';
+
+  _DrawerState(this.imageUrl);
+
+  @override
+  void initState() {
+    super.initState();
+    print("_DrawerState initState");
+    _getVersion();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print("_DrawerState dispose");
+  }
+
+  _getVersion() {
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
       setState(() {
-        imageUrl = url;
+        version = packageInfo.version;
       });
     });
   }
@@ -102,6 +113,7 @@ class _DrawerState extends State<_MyDrawer> {
                     Icons.star,
                     color: Colors.grey,
                   ),
+                  onTap: () {},
                 ),
               ],
             )),
