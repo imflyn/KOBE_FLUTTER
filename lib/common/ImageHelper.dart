@@ -1,3 +1,6 @@
+
+import 'package:flutter/material.dart';
+
 class ImageHelper {
 
 
@@ -5,4 +8,5 @@ class ImageHelper {
   static String wrapAssets(String url) {
     return "assets/images/" + url;
   }
+
 }
