@@ -24,4 +24,10 @@ class ApiService {
     http.Response res = await http.get("https://gank.io/api/v2/categories/GanHuo");
     return Categories.fromJson(jsonDecode(res.body));
   }
+
+  static Future<Categories> getArticleList() async {
+    print("getCategories start");
+    http.Response res = await http.get("https://gank.io/api/v2/categories/GanHuo");
+    return Categories.fromJson(jsonDecode(res.body));
+  }
 }
