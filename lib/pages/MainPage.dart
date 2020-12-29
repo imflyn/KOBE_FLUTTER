@@ -39,10 +39,15 @@ class _HomePageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).main_page),
+      // extendBodyBehindAppBar: true,
+      // appBar: AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      // ),
+      drawer: Theme(
+        data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+        child: _MyDrawer(imageUrl),
       ),
-      drawer: _MyDrawer(imageUrl),
       body: HomePage(),
     );
   }
