@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:kobe_flutter/common/ImageHelper.dart';
@@ -15,7 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List _bannerDataList = List<BannerImageData>();
+  List<BannerImageData> _bannerDataList = List<BannerImageData>();
 
   @override
   void initState() {
@@ -47,7 +48,11 @@ class _HomePageState extends State<HomePage> {
     return Container(
       child: ConstrainedBox(
           child: _bannerDataList.isEmpty
-              ? Image.asset(ImageHelper.wrapAssets("icon_image_default.png"))
+              ? Image.asset(
+                  ImageHelper.wrapAssets("icon_image_default.png"),
+                  fit: BoxFit.fill,
+                  width: MediaQuery.of(context).size.width,
+                )
               : Swiper(
                   autoplayDisableOnInteraction: true,
                   autoplayDelay: 8000,
@@ -56,14 +61,32 @@ class _HomePageState extends State<HomePage> {
                   outer: false,
                   autoplay: true,
                   itemBuilder: (BuildContext context, int index) {
-                    return FadeInImage(
-                        image: NetworkImage(_bannerDataList[index].image),
-                        placeholder: AssetImage(ImageHelper.wrapAssets("icon_image_default.png")),
-                        fit: BoxFit.cover);
+                    return Stack(
+                      alignment: Alignment.bottomLeft,
+                      children: [
+                        FadeInImage(
+                            width: MediaQuery.of(context).size.width,
+                            image: NetworkImage(_bannerDataList[index].image),
+                            placeholder: AssetImage(ImageHelper.wrapAssets("icon_image_default.png")),
+                            fit: BoxFit.cover),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 46,
+                          color: Colors.black.withAlpha(66),
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 8, top: 8, right: 8),
+                            child: Text(
+                              _bannerDataList[index].title,
+                              style: TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
                   },
                   pagination: SwiperPagination(
                       margin: new EdgeInsets.all(5.0),
-                      builder: DotSwiperPaginationBuilder(size: 5, activeSize: 6, activeColor: Colors.black, color: Colors.black12)),
+                      builder: DotSwiperPaginationBuilder(size: 5, activeSize: 6, activeColor: Colors.black, color: Colors.grey)),
                   itemCount: _bannerDataList.length,
                 ),
           constraints: BoxConstraints.loose(new Size(MediaQuery.of(context).size.width, 225.0))),
