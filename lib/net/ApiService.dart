@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:kobe_flutter/net/bean/article_list.dart';
 
 import 'bean/banner_image_list.dart';
 import 'bean/categories.dart';
@@ -25,9 +26,10 @@ class ApiService {
     return Categories.fromJson(jsonDecode(res.body));
   }
 
-  static Future<Categories> getArticleList() async {
-    print("getCategories start");
-    http.Response res = await http.get("https://gank.io/api/v2/categories/GanHuo");
-    return Categories.fromJson(jsonDecode(res.body));
+
+  static Future<ArticleList> getArticleList(String category,int page) async {
+    print("getArticleList start");
+    http.Response res = await http.get("https://gank.io/api/v2/data/category/Article/type/$category/page/$page/count/10");
+    return ArticleList.fromJson(jsonDecode(res.body));
   }
 }

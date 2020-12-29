@@ -6,6 +6,7 @@ import 'package:kobe_flutter/common/GlobalConfig.dart';
 import 'package:kobe_flutter/common/ImageHelper.dart';
 import 'package:kobe_flutter/generated/l10n.dart';
 import 'package:kobe_flutter/net/ApiService.dart';
+import 'package:kobe_flutter/net/bean/article_list.dart';
 import 'package:kobe_flutter/net/bean/banner_image_list.dart';
 import 'package:kobe_flutter/net/bean/categories.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -130,7 +131,8 @@ class _HomePageState extends State<HomePage> {
                                         },
                                         pagination: SwiperPagination(
                                             margin: new EdgeInsets.all(5.0),
-                                            builder: DotSwiperPaginationBuilder(size: 5, activeSize: 6, activeColor: Colors.black, color: Colors.grey)),
+                                            builder:
+                                                DotSwiperPaginationBuilder(size: 5, activeSize: 6, activeColor: Colors.black, color: Colors.grey)),
                                         itemCount: _bannerDataList.length,
                                       ),
                               ),
@@ -160,33 +162,55 @@ class _HomePageState extends State<HomePage> {
                 ];
               },
               body: TabBarView(
-                children: categorieList.map((Categorie categorie) => RefreshListView()).toList(),
+                children: categorieList.map((Categorie categorie) => RefreshListView(categorie.title)).toList(),
               ),
             ));
   }
 }
 
 class RefreshListView extends StatefulWidget {
+  String _category = "";
+
+  RefreshListView(this._category);
+
   @override
   State<StatefulWidget> createState() {
-    return _RefreshListViewState();
+    return _RefreshListViewState(_category);
   }
 }
 
 class _RefreshListViewState extends State<RefreshListView> {
-  List<String> items = ["1", "2", "3", "4", "5", "6", "7", "8", "1", "2", "3", "4", "5", "6", "7", "8", "1", "2", "3", "4", "5", "6", "7", "8"];
+  String _category = "";
+  int _page = 0;
+  List<Article> _articleList = List<Article>();
+
+  _RefreshListViewState(this._category);
+
   RefreshController _refreshController = RefreshController(initialRefresh: true);
 
   void _onRefresh() async {
-    await Future.delayed(Duration(milliseconds: 1000));
-    _refreshController.refreshCompleted();
+    _page = 0;
+    _getArticleList();
   }
 
   void _onLoading() async {
-    await Future.delayed(Duration(milliseconds: 250));
-    items.add((items.length + 1).toString());
-    if (mounted) setState(() {});
-    _refreshController.loadComplete();
+    _page++;
+    _getArticleList();
+  }
+
+  _getArticleList() {
+    ApiService.getArticleList(_category, _page).then((ArticleList bean) {
+      _refreshController.refreshCompleted();
+      _refreshController.loadComplete();
+      if (null != bean && bean.data != null) {
+        setState(() {
+          _articleList = bean.data;
+        });
+      }
+    }).catchError((Object e){
+      _refreshController.refreshCompleted();
+      _refreshController.loadComplete();
+    });
   }
 
   @override
@@ -220,9 +244,9 @@ class _RefreshListViewState extends State<RefreshListView> {
       onLoading: _onLoading,
       child: ListView.builder(
         physics: BouncingScrollPhysics(),
-        itemBuilder: (c, i) => Card(child: Center(child: Text(items[i]))),
+        itemBuilder: (c, i) => Card(child: Center(child: Text(_articleList[i].desc))),
         itemExtent: 100.0,
-        itemCount: items.length,
+        itemCount: _articleList.length,
       ),
     );
   }
@@ -230,7 +254,7 @@ class _RefreshListViewState extends State<RefreshListView> {
   // don't forget to dispose refreshController
   @override
   void dispose() {
-    _refreshController.dispose();
     super.dispose();
+    _refreshController.dispose();
   }
 }
