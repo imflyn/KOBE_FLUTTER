@@ -11,6 +11,8 @@ import 'package:kobe_flutter/net/bean/banner_image_list.dart';
 import 'package:kobe_flutter/net/bean/categories.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'ArticleDetailPage.dart';
+
 class HomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -256,31 +258,40 @@ class _RefreshListViewState extends State<RefreshListView> with AutomaticKeepAli
             margin: EdgeInsets.only(top: 8, left: 8, right: 8),
             elevation: 3,
             color: Colors.white,
-            child: Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(article.author, style: TextStyle(fontSize: 14, color: GlobalConfig.color_666666))),
-                      Text(article.createdAt, style: TextStyle(fontSize: 14, color: GlobalConfig.color_666666))
-                    ],
+            child: MaterialButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  new MaterialPageRoute(builder: (context) => ArticleDetailPage(article)),
+                );
+              },
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(article.author, style: TextStyle(fontSize: 14, color: GlobalConfig.color_666666))),
+                        Text(article.createdAt, style: TextStyle(fontSize: 14, color: GlobalConfig.color_666666))
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  margin: EdgeInsets.fromLTRB(8, 0, 8, 8),
-                  child: Text(article.title, style: TextStyle(fontSize: 14, color: GlobalConfig.color_333333)),
-                ),
-                Container(
-                  alignment: Alignment.topLeft,
-                  margin: EdgeInsets.fromLTRB(8, 0, 8, 8),
-                  child: FadeInImage(
-                      image: article.images.isEmpty ? AssetImage(ImageHelper.wrapAssets("icon_image_default.png")) : NetworkImage(article.images[0]),
-                      placeholder: AssetImage(ImageHelper.wrapAssets("icon_image_default.png")),
-                      fit: BoxFit.cover),
-                ),
-              ],
+                  Container(
+                    alignment: Alignment.topLeft,
+                    margin: EdgeInsets.fromLTRB(8, 0, 8, 8),
+                    child: Text(article.title, style: TextStyle(fontSize: 14, color: GlobalConfig.color_333333)),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    alignment: Alignment.topLeft,
+                    margin: EdgeInsets.fromLTRB(8, 0, 8, 8),
+                    child: FadeInImage(
+                        image: article.images.isEmpty ? AssetImage(ImageHelper.wrapAssets("icon_image_default.png")) : NetworkImage(article.images[0]),
+                        placeholder: AssetImage(ImageHelper.wrapAssets("icon_image_default.png")),
+                        fit: BoxFit.cover),
+                  ),
+                ],
+              ),
             ),
           );
         },
