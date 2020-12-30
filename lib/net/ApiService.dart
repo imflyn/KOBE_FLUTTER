@@ -29,7 +29,7 @@ class ApiService {
 
   static Future<ArticleList> getArticleList(String category,int page) async {
     print("getArticleList start");
-    http.Response res = await http.get("https://gank.io/api/v2/data/category/Article/type/$category/page/$page/count/10");
+    http.Response res = await http.get("https://gank.io/api/v2/data/category/GanHuo/type/$category/page/$page/count/10");
     return ArticleList.fromJson(jsonDecode(res.body));
   }
 }

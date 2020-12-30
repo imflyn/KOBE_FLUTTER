@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                       title: top != 120 ? Text("") : Text(S.of(context).main_page, style: TextStyle(fontSize: 18)),
                       centerTitle: false,
                       pinned: true,
-                      floating: false,
+                      floating: true,
                       snap: false,
                       primary: true,
                       expandedHeight: 250.0,
@@ -131,8 +131,7 @@ class _HomePageState extends State<HomePage> {
                                         },
                                         pagination: SwiperPagination(
                                             margin: new EdgeInsets.all(5.0),
-                                            builder:
-                                                DotSwiperPaginationBuilder(size: 5, activeSize: 6, activeColor: Colors.black, color: Colors.grey)),
+                                            builder: DotSwiperPaginationBuilder(size: 5, activeSize: 6, activeColor: Colors.black, color: Colors.grey)),
                                         itemCount: _bannerDataList.length,
                                       ),
                               ),
@@ -162,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                 ];
               },
               body: TabBarView(
-                children: categorieList.map((Categorie categorie) => RefreshListView(categorie.title)).toList(),
+                children: categorieList.map((Categorie categorie) => RefreshListView(categorie.type)).toList(),
               ),
             ));
   }
@@ -179,13 +178,15 @@ class RefreshListView extends StatefulWidget {
   }
 }
 
-class _RefreshListViewState extends State<RefreshListView> {
+class _RefreshListViewState extends State<RefreshListView> with AutomaticKeepAliveClientMixin {
   String _category = "";
   int _page = 0;
   List<Article> _articleList = List<Article>();
 
   _RefreshListViewState(this._category);
 
+  @override
+  bool get wantKeepAlive => true;
   RefreshController _refreshController = RefreshController(initialRefresh: true);
 
   void _onRefresh() async {
@@ -204,10 +205,14 @@ class _RefreshListViewState extends State<RefreshListView> {
       _refreshController.loadComplete();
       if (null != bean && bean.data != null) {
         setState(() {
-          _articleList = bean.data;
+          if (_page == 0) {
+            _articleList = bean.data;
+          } else {
+            _articleList.addAll(bean.data);
+          }
         });
       }
-    }).catchError((Object e){
+    }).catchError((Object e) {
       _refreshController.refreshCompleted();
       _refreshController.loadComplete();
     });
@@ -215,6 +220,7 @@ class _RefreshListViewState extends State<RefreshListView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: true,
@@ -244,8 +250,40 @@ class _RefreshListViewState extends State<RefreshListView> {
       onLoading: _onLoading,
       child: ListView.builder(
         physics: BouncingScrollPhysics(),
-        itemBuilder: (c, i) => Card(child: Center(child: Text(_articleList[i].desc))),
-        itemExtent: 100.0,
+        itemBuilder: (context, index) {
+          Article article = _articleList[index];
+          return Card(
+            margin: EdgeInsets.only(top: 8, left: 8, right: 8),
+            elevation: 3,
+            color: Colors.white,
+            child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(article.author, style: TextStyle(fontSize: 14, color: GlobalConfig.color_666666))),
+                      Text(article.createdAt, style: TextStyle(fontSize: 14, color: GlobalConfig.color_666666))
+                    ],
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: Text(article.title, style: TextStyle(fontSize: 14, color: GlobalConfig.color_333333)),
+                ),
+                Container(
+                  alignment: Alignment.topLeft,
+                  margin: EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  child: FadeInImage(
+                      image: article.images.isEmpty ? AssetImage(ImageHelper.wrapAssets("icon_image_default.png")) : NetworkImage(article.images[0]),
+                      placeholder: AssetImage(ImageHelper.wrapAssets("icon_image_default.png")),
+                      fit: BoxFit.cover),
+                ),
+              ],
+            ),
+          );
+        },
         itemCount: _articleList.length,
       ),
     );
