@@ -49,3 +49,4 @@ app.*.map.json
 /.gradle/vcs-1/gc.properties
 /.gradle/6.7/fileChanges/last-build.bin
 /local.properties
+/ios/Podfile.lock
